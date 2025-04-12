@@ -28,11 +28,17 @@ public class LearningPlanController {
     public LearningPlan createPlan(@RequestBody LearningPlan plan) {
         return service.createPlan(plan);
     }
-
-    @GetMapping("/user/{userId}")
-    public List<LearningPlan> getPlansByUser(@PathVariable String userId) {
-        return service.getPlansByUser(userId);
+   
+    @GetMapping
+    public List<LearningPlan> getAllPlans() {
+        return service.getAllPlans();
     }
+
+    @GetMapping("/{id}")
+public LearningPlan getPlanById(@PathVariable String id) {
+    return service.getPlanById(id);
+}
+
 
     @PutMapping("/{id}")
     public LearningPlan updatePlan(@PathVariable String id, @RequestBody LearningPlan plan) {

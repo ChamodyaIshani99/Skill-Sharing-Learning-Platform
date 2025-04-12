@@ -17,9 +17,10 @@ public class LerningPlanService {
         return repository.save(plan);
     }
 
-    public List<LearningPlan> getPlansByUser(String userId) {
-        return repository.findByUserId(userId);
+    public LearningPlan getPlanById(String id) {
+        return repository.findById(id).orElse(null);
     }
+    
 
     public LearningPlan updatePlan(String id, LearningPlan updatedPlan) {
         updatedPlan.setId(id);
@@ -29,4 +30,9 @@ public class LerningPlanService {
     public void deletePlan(String id) {
         repository.deleteById(id);
     }
+
+    public List<LearningPlan> getAllPlans() {
+        return repository.findAll();
+    }
+    
 }
