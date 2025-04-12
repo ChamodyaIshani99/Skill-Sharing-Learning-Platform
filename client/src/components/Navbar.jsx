@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +19,7 @@ const Navbar = () => {
           <a href="#" className="hover:text-blue-600 transition">About</a>
           <a href="#" className="hover:text-blue-600 transition">Skills</a>
           <a href="#" className="hover:text-blue-600 transition">Contact</a>
+          <Link to="/learning-plan" className="hover:text-blue-600 transition">Learning Plan</Link>
         </div>
 
         {/* Right - Login button */}
@@ -42,6 +44,7 @@ const Navbar = () => {
           <a href="#" className="block hover:text-blue-600">About</a>
           <a href="#" className="block hover:text-blue-600">Skills</a>
           <a href="#" className="block hover:text-blue-600">Contact</a>
+          <Link to="/learning-plan" className="block hover:text-blue-600">Learning Plan</Link>
           <button className="bg-blue-600 text-white w-full px-4 py-2 rounded hover:bg-blue-700 transition">
             Login
           </button>

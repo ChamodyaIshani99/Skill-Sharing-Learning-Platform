@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const LearningPlanForm = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -22,10 +23,49 @@ const LearningPlanForm = ({ onSubmit }) => {
   const addTopic = () => setTopics([...topics, ""]);
   const addResource = () => setResources([...resources, ""]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ title, description, topics, resources, timeline });
+  
+    const learningPlan = {
+      title,
+      description,
+      topics,
+      resources,
+      startDate: timeline.start,
+      endDate: timeline.end,
+      userId: "user123", // Replace this with actual user id if available
+    };
+  
+    try {
+      const response = await fetch("http://localhost:8081/api/learning-plans", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(learningPlan),
+      });
+  
+      if (response.ok) {
+        const savedPlan = await response.json();
+        console.log("Saved plan:", savedPlan);
+        alert("Learning Plan saved successfully!");
+  
+        // Optionally reset form here
+        setTitle("");
+        setDescription("");
+        setTopics([""]);
+        setResources([""]);
+        setTimeline({ start: "", end: "" });
+  
+      } else {
+        alert("Failed to save plan.");
+      }
+    } catch (error) {
+      console.error("Error saving plan:", error);
+      alert("Error occurred while saving plan.");
+    }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow-md">
