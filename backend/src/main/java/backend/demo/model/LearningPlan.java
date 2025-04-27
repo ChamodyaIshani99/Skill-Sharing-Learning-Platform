@@ -22,8 +22,8 @@ public class LearningPlan {
     private String title;
     private String description;
 
-    private List<String> topics;
-    private List<String> resources;
+    private List<Topic> topics;
+    
 
     private Date startDate;
     private Date endDate;

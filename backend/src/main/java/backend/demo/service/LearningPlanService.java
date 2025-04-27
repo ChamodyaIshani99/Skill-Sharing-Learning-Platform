@@ -33,7 +33,13 @@ public class LearningPlanService {
     }
 
     public List<LearningPlan> getAllPlans() {
+    try {
         return repository.findAll();
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error fetching learning plans: " + e.getMessage());
     }
+}
+
     
 }
