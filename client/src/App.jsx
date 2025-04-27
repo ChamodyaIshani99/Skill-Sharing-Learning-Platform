@@ -1,6 +1,7 @@
 import LearningPlansPage from "./pages/LearningPlansPage";
 
 function App() {
+  
   return <LearningPlansPage/>;
 }
 

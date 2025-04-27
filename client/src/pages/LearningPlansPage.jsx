@@ -5,6 +5,7 @@ import LearningPlanList from "../components/LearningPlan/LearningPlanList";
 import LoadingSpinner from "../components/LearningPlan/LoadingSpinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Plan from "../assets/plan.jpg";
 
 const LearningPlansPage = () => {
   const [plans, setPlans] = useState([]);
@@ -61,7 +62,7 @@ const LearningPlansPage = () => {
   
 
   return (
-    <div className="p-8 bg-gradient-to-tr from-blue-50 to-blue-100 min-h-screen">
+    <div className="p-8 min-h-screen">
       <ToastContainer />
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-extrabold text-blue-700">🎯 Learning Plans</h1>
@@ -69,9 +70,45 @@ const LearningPlansPage = () => {
           onClick={() => setFormVisible(true)} 
           className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all duration-300"
         >
-          ➕ Add Plan
+          Add  New Plan
         </button>
       </div>
+
+  <div className="flex min-h-[70vh]"> {/* Reduced height here */}
+  {/* Left Side - Cards with gray background */}
+  <div className="w-1/2 pl-16 pr-8 pt-8 bg-gray-100">
+    <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transform transition-transform duration-300 hover:scale-105">
+      <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Total Plans</h5>
+      <h1 className="text-6xl text-gray-700 dark:text-gray-400">5</h1>
+    </div>
+    <br />
+    <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transform transition-transform duration-300 hover:scale-105">
+      <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Pending Plans</h5>
+      <h1 className="text-6xl text-gray-700 dark:text-gray-400">5</h1>
+    </div>
+    <br /><br />
+    <button 
+  type="button" 
+  className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+  onClick={() => document.getElementById('all-plans').scrollIntoView({ behavior: 'smooth' })}
+>
+  See All Plans
+</button>
+
+  </div>
+
+  {/* Right Side - Image without background color */}
+  <div className="w-1/2 flex justify-center items-start p-8 pr-24 -mt-8">
+    <img
+      src={Plan}
+      alt="Plan Image"
+      className="w-full max-w-lg rounded-3xl"
+    />
+  </div>
+</div>
+<br /><br />
+<h1 id="all-plans" className="text-2xl font-bold">All Plans</h1>
+
 
       {loading ? (
         <LoadingSpinner />

@@ -22,40 +22,28 @@ const LearningPlanList = ({ plans, onEdit, onDelete }) => {
     return Math.round((completed / resources.length) * 100);
   };
 
+  const calculateDaysRemaining = (endDate) => {
+    const today = new Date();
+    const deadline = new Date(endDate);
+    const timeDiff = deadline - today;
+    return Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert time difference to days
+  };
+
   return (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {planStates.map(plan => (
         <div key={plan.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col relative">
-          <h3 className="text-xl font-bold mb-2">{plan.title}</h3>
+          {/* Title */}
+        
+          <h2 className="text-3xl font-extrabold mb-2 text-center">{plan.title}</h2>
+
+
+          {/* Description */}
           <p className="text-gray-600 mb-2">{plan.description}</p>
 
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500"><strong>Start:</strong> {plan.startDate?.split('T')[0]}</span>
-            <span className="text-sm text-gray-500"><strong>End:</strong> {plan.endDate?.split('T')[0]}</span>
-          </div>
+          
 
-          {/* Progress Circle */}
-          <div className="flex justify-center my-4">
-            <div className="relative w-20 h-20">
-              <svg className="w-full h-full">
-                <circle
-                  cx="50%" cy="50%" r="30%"
-                  stroke="#e5e7eb" strokeWidth="8" fill="none"
-                />
-                <circle
-                  cx="50%" cy="50%" r="30%"
-                  stroke="#3b82f6" strokeWidth="8" fill="none"
-                  strokeDasharray="188"
-                  strokeDashoffset={188 - (188 * calculateProgress(plan.resources)) / 100}
-                  strokeLinecap="round"
-                  transform="rotate(-90 50 50)"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
-                {calculateProgress(plan.resources)}%
-              </div>
-            </div>
-          </div>
+          
 
           {/* Resources List */}
           <div className="space-y-1">
@@ -73,6 +61,27 @@ const LearningPlanList = ({ plans, onEdit, onDelete }) => {
             ))}
           </div>
 
+          {/* Topics List */}
+          <div className="mt-4">
+            <h4 className="font-semibold text-sm text-gray-600">Topics:</h4>
+            <ul className="list-disc pl-5">
+              {plan.topics?.map((topic, index) => (
+                <li key={index} className="text-gray-700">{topic.name}</li>
+              ))}
+            </ul>
+          </div><br />
+          {/* Start and End Dates */}
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-500"><strong>Start:</strong> {plan.startDate?.split('T')[0]}</span>
+            <span className="text-sm text-gray-500"><strong>End:</strong> {plan.endDate?.split('T')[0]}</span>
+          </div>
+
+          {/* Days Remaining */}
+          <div className="text-sm text-red-500 mb-4">
+            <strong>Days Remaining:</strong> {calculateDaysRemaining(plan.endDate)} days
+          </div>
+
+          {/* Action Buttons */}
           <div className="mt-auto flex justify-end space-x-3 pt-4">
             <button onClick={() => onEdit(plan)} className="text-blue-500 hover:text-blue-700"><FaEdit /></button>
             <button onClick={() => onDelete(plan.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
@@ -84,5 +93,3 @@ const LearningPlanList = ({ plans, onEdit, onDelete }) => {
 };
 
 export default LearningPlanList;
-
-
