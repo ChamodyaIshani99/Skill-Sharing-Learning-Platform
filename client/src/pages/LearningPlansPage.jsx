@@ -12,17 +12,28 @@ const LearningPlansPage = () => {
   const [loading, setLoading] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState({});
+  const [totalPlans, setTotalPlans] = useState(0);
+  const [pendingPlans, setPendingPlans] = useState(0);
 
   const fetchPlans = async () => {
     setLoading(true);
     try {
       const res = await getAllPlans();
       setPlans(res.data);
+      updatePlanCounts(res.data);
     } catch (err) {
       console.error(err);
       toast.error("Failed to load plans");
     }
     setLoading(false);
+  };
+
+  const updatePlanCounts = (plansData) => {
+    setTotalPlans(plansData.length);
+    const pending = plansData.filter(plan => 
+      !plan.resources?.every(resource => resource.completed)
+    ).length;
+    setPendingPlans(pending);
   };
 
   useEffect(() => {
@@ -59,7 +70,11 @@ const LearningPlansPage = () => {
       }
     }
   };
-  
+
+  const handleResourceToggle = (updatedPlans) => {
+    setPlans(updatedPlans);
+    updatePlanCounts(updatedPlans);
+  };
 
   return (
     <div className="p-8 min-h-screen">
@@ -70,45 +85,40 @@ const LearningPlansPage = () => {
           onClick={() => setFormVisible(true)} 
           className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all duration-300"
         >
-          Add  New Plan
+          Add New Plan
         </button>
       </div>
 
-  <div className="flex min-h-[70vh]"> {/* Reduced height here */}
-  {/* Left Side - Cards with gray background */}
-  <div className="w-1/2 pl-16 pr-8 pt-8 bg-gray-100">
-    <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transform transition-transform duration-300 hover:scale-105">
-      <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Total Plans</h5>
-      <h1 className="text-6xl text-gray-700 dark:text-gray-400">5</h1>
-    </div>
-    <br />
-    <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transform transition-transform duration-300 hover:scale-105">
-      <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Pending Plans</h5>
-      <h1 className="text-6xl text-gray-700 dark:text-gray-400">5</h1>
-    </div>
-    <br /><br />
-    <button 
-  type="button" 
-  className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-  onClick={() => document.getElementById('all-plans').scrollIntoView({ behavior: 'smooth' })}
->
-  See All Plans
-</button>
+      <div className="flex min-h-[70vh]">
+        {/* Left side */}
+        <div className="w-1/2 pl-16 pr-8 pt-8 bg-gray-100">
+          <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 transform transition-transform duration-300 hover:scale-105">
+            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">Total Plans</h5>
+            <h1 className="text-6xl text-gray-700">{totalPlans}</h1>
+          </div>
+          <br />
+          <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 transform transition-transform duration-300 hover:scale-105">
+            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">Pending Plans</h5>
+            <h1 className="text-6xl text-gray-700">{pendingPlans}</h1>
+          </div>
+          <br /><br />
+          <button 
+            type="button" 
+            className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            onClick={() => document.getElementById('all-plans').scrollIntoView({ behavior: 'smooth' })}
+          >
+            See All Plans
+          </button>
+        </div>
 
-  </div>
+        {/* Right side */}
+        <div className="w-1/2 flex justify-center items-start p-8 pr-24 -mt-8">
+          <img src={Plan} alt="Plan" className="w-full max-w-lg rounded-3xl" />
+        </div>
+      </div>
 
-  {/* Right Side - Image without background color */}
-  <div className="w-1/2 flex justify-center items-start p-8 pr-24 -mt-8">
-    <img
-      src={Plan}
-      alt="Plan Image"
-      className="w-full max-w-lg rounded-3xl"
-    />
-  </div>
-</div>
-<br /><br />
-<h1 id="all-plans" className="text-2xl font-bold">All Plans</h1>
-
+      <br /><br />
+      <h1 id="all-plans" className="text-2xl font-bold mb-4">All Plans</h1>
 
       {loading ? (
         <LoadingSpinner />
@@ -116,7 +126,8 @@ const LearningPlansPage = () => {
         <LearningPlanList 
           plans={plans} 
           onEdit={(plan) => { setSelectedPlan(plan); setFormVisible(true); }} 
-          onDelete={handleDelete} 
+          onDelete={handleDelete}
+          onResourceToggle={handleResourceToggle}
         />
       )}
 
