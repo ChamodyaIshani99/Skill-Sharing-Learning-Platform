@@ -9,7 +9,7 @@ import backend.demo.model.LearningPlan;
 import backend.demo.repository.LearningPlanRepository;
 
 @Service
-public class LerningPlanService {
+public class LearningPlanService {
     @Autowired
     private LearningPlanRepository repository;
 

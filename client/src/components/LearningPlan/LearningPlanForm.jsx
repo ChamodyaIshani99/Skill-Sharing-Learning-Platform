@@ -1,142 +1,122 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import animationImage from "../../assets/Business Plan.png"; // You can change this to your animation image path
 
-const LearningPlanForm = ({ onSubmit }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [topics, setTopics] = useState([""]);
-  const [resources, setResources] = useState([""]);
-  const [timeline, setTimeline] = useState({ start: "", end: "" });
+const LearningPlanForm = ({ onSave, onCancel, initialData = {} }) => {
+  const [plan, setPlan] = useState({
+    title: "",
+    description: "",
+    topics: "",
+    resources: [""],
+    startDate: "",
+    endDate: "",
+  });
 
-  const handleTopicChange = (index, value) => {
-    const newTopics = [...topics];
-    newTopics[index] = value;
-    setTopics(newTopics);
+  useEffect(() => {
+    if (initialData.id) {
+      setPlan({
+        ...initialData,
+        topics: initialData.topics?.join(", "),
+        resources: initialData.resources || [""],
+      });
+    }
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    setPlan({ ...plan, [e.target.name]: e.target.value });
   };
 
   const handleResourceChange = (index, value) => {
-    const newResources = [...resources];
-    newResources[index] = value;
-    setResources(newResources);
+    const updatedResources = [...plan.resources];
+    updatedResources[index] = value;
+    setPlan({ ...plan, resources: updatedResources });
   };
 
-  const addTopic = () => setTopics([...topics, ""]);
-  const addResource = () => setResources([...resources, ""]);
+  const addResourceField = () => {
+    setPlan({ ...plan, resources: [...plan.resources, ""] });
+  };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-  
-    const learningPlan = {
-      title,
-      description,
-      topics,
-      resources,
-      startDate: timeline.start,
-      endDate: timeline.end,
-      userId: "user123", // Replace this with actual user id if available
-    };
-  
-    try {
-      const response = await fetch("http://localhost:8081/api/learning-plans", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(learningPlan),
-      });
-  
-      if (response.ok) {
-        const savedPlan = await response.json();
-        console.log("Saved plan:", savedPlan);
-        alert("Learning Plan saved successfully!");
-  
-        // Optionally reset form here
-        setTitle("");
-        setDescription("");
-        setTopics([""]);
-        setResources([""]);
-        setTimeline({ start: "", end: "" });
-  
-      } else {
-        alert("Failed to save plan.");
-      }
-    } catch (error) {
-      console.error("Error saving plan:", error);
-      alert("Error occurred while saving plan.");
+    if (!plan.title || !plan.description) {
+      alert("Title and Description are required.");
+      return;
     }
+    onSave({
+      ...plan,
+      topics: plan.topics.split(",").map(t => t.trim()),
+      resources: plan.resources.filter(r => r.trim() !== ""),
+    });
   };
-
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow-md">
-      <h2 className="text-xl font-bold">Create Learning Plan</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
+      <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-xl shadow-2xl w-[900px] flex">
+        
+        {/* Left Side Form */}
+        <div className="w-2/3 space-y-4 pr-6">
+          <h2 className="text-3xl font-bold text-center mb-6">{initialData.id ? "Update" : "Create"} Learning Plan</h2>
 
-      <input
-        type="text"
-        placeholder="Plan Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-        className="w-full p-2 border rounded"
-      />
+          <div>
+            <label className="block mb-1 font-semibold">Title</label>
+            <input type="text" name="title" value={plan.title} onChange={handleChange} className="input input-bordered w-full" />
+          </div>
 
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="w-full p-2 border rounded"
-      />
+          <div>
+            <label className="block mb-1 font-semibold">Description</label>
+            <textarea name="description" value={plan.description} onChange={handleChange} className="textarea textarea-bordered w-full" />
+          </div>
 
-      <div>
-        <label className="font-semibold">Topics</label>
-        {topics.map((topic, i) => (
-          <input
-            key={i}
-            type="text"
-            value={topic}
-            onChange={(e) => handleTopicChange(i, e.target.value)}
-            className="w-full p-2 border rounded mt-1 mb-2"
-          />
-        ))}
-        <button type="button" onClick={addTopic} className="text-blue-600">+ Add Topic</button>
-      </div>
+          <div>
+            <label className="block mb-1 font-semibold">Topics (comma separated)</label>
+            <input type="text" name="topics" value={plan.topics} onChange={handleChange} className="input input-bordered w-full" />
+          </div>
 
-      <div>
-        <label className="font-semibold">Resources</label>
-        {resources.map((resource, i) => (
-          <input
-            key={i}
-            type="text"
-            value={resource}
-            onChange={(e) => handleResourceChange(i, e.target.value)}
-            className="w-full p-2 border rounded mt-1 mb-2"
-          />
-        ))}
-        <button type="button" onClick={addResource} className="text-blue-600">+ Add Resource</button>
-      </div>
+          <div>
+            <label className="block mb-1 font-semibold">Resources</label>
+            {plan.resources.map((resource, index) => (
+              <input
+                key={index}
+                type="text"
+                value={resource}
+                onChange={(e) => handleResourceChange(index, e.target.value)}
+                placeholder={`Resource ${index + 1}`}
+                className="input input-bordered w-full mb-2"
+              />
+            ))}
+            <button type="button" onClick={addResourceField} className="btn btn-outline btn-sm mt-1">
+              ➕ Add More Resources
+            </button>
+          </div>
 
-      <div className="flex gap-4">
-        <input
-          type="date"
-          value={timeline.start}
-          onChange={(e) => setTimeline({ ...timeline, start: e.target.value })}
-          className="p-2 border rounded"
-        />
-        <input
-          type="date"
-          value={timeline.end}
-          onChange={(e) => setTimeline({ ...timeline, end: e.target.value })}
-          className="p-2 border rounded"
-        />
-      </div>
+          <div className="flex space-x-4">
+            <div className="flex-1">
+              <label className="block mb-1 font-semibold">Start Date</label>
+              <input type="date" name="startDate" value={plan.startDate} onChange={handleChange} className="input input-bordered w-full" />
+            </div>
+            <div className="flex-1">
+              <label className="block mb-1 font-semibold">End Date</label>
+              <input type="date" name="endDate" value={plan.endDate} onChange={handleChange} className="input input-bordered w-full" />
+            </div>
+          </div>
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Save Plan
-      </button>
-    </form>
+          <div className="flex justify-between pt-6">
+            <button type="submit" className="btn btn-primary w-1/2">Save</button>
+            <button type="button" onClick={onCancel} className="btn btn-ghost w-1/2">Cancel</button>
+          </div>
+        </div>
+
+        {/* Right Side Animation */}
+<div className="w-1/3 flex items-center justify-center">
+  <img 
+    src={animationImage} 
+  alt="Learning Animation" 
+  className="w-full h-auto animate-float shadow-lg" 
+  />
+</div>
+
+
+      </form>
+    </div>
   );
 };
 

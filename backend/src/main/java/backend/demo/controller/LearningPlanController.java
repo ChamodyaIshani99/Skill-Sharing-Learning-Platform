@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.demo.model.LearningPlan;
-import backend.demo.service.LerningPlanService;
+import backend.demo.service.LearningPlanService;
+
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ import java.util.List;
 public class LearningPlanController {
 
     @Autowired
-    private LerningPlanService service;
+    private LearningPlanService service;
 
     @PostMapping
     public LearningPlan createPlan(@RequestBody LearningPlan plan) {

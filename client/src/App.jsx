@@ -1,22 +1,7 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LearningPlanForm from './components/LearningPlan/LearningPlanForm';
-import Navbar from './components/Navbar';
+import LearningPlansPage from "./pages/LearningPlansPage";
 
 function App() {
-  return (
-    <Router>
-      <Navbar />
-      <div className='p-4'>
-        <Routes>
-          <Route 
-            path="/learning-plan" 
-            element={<LearningPlanForm onSubmit={(data) => console.log(data)} />} 
-          />
-        </Routes>
-      </div>
-    </Router>
-  );
+  return <LearningPlansPage/>;
 }
 
 export default App;
