@@ -5,7 +5,7 @@ import LearningPlanList from "../components/LearningPlan/LearningPlanList";
 import LoadingSpinner from "../components/LearningPlan/LoadingSpinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Plan from "../assets/plan.jpg";
+import Plan from "../assets/plan.png";
 
 const LearningPlansPage = () => {
   const [plans, setPlans] = useState([]);
@@ -77,7 +77,7 @@ const LearningPlansPage = () => {
   };
 
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-8 min-h-screen bg-black">
       <ToastContainer />
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-extrabold text-blue-700">🎯 Learning Plans</h1>

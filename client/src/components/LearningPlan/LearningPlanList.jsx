@@ -8,22 +8,15 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
     setPlanStates(plans);
   }, [plans]);
 
-  const toggleCompletion = (planId) => {
-    const updatedPlans = planStates.map(plan => {
-      if (plan.id === planId) {
-        return { ...plan, completed: !plan.completed };
-      }
-      return plan;
-    });
-    setPlanStates(updatedPlans);
-  };
-
   const toggleResource = (planId, index) => {
     const updatedPlans = planStates.map(plan => {
       if (plan.id === planId) {
         const updatedResources = [...plan.resources];
         updatedResources[index].completed = !updatedResources[index].completed;
-        return { ...plan, resources: updatedResources };
+
+        const updatedPlan = { ...plan, resources: updatedResources };
+        updatedPlan.completed = calculateProgress(updatedResources, plan.topics) === 100;
+        return updatedPlan;
       }
       return plan;
     });
@@ -31,10 +24,30 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
     onResourceToggle(updatedPlans);
   };
 
-  const calculateProgress = (resources) => {
-    if (!resources || resources.length === 0) return 0;
-    const completed = resources.filter(r => r.completed).length;
-    return Math.round((completed / resources.length) * 100);
+  const toggleTopic = (planId, topicIndex) => {
+    const updatedPlans = planStates.map(plan => {
+      if (plan.id === planId) {
+        const updatedTopics = [...plan.topics];
+        updatedTopics[topicIndex].completed = !updatedTopics[topicIndex].completed;
+
+        const updatedPlan = { ...plan, topics: updatedTopics };
+        updatedPlan.completed = calculateProgress(plan.resources, updatedTopics) === 100;
+        return updatedPlan;
+      }
+      return plan;
+    });
+    setPlanStates(updatedPlans);
+  };
+
+  const calculateProgress = (resources, topics) => {
+    const totalItems = (resources?.length || 0) + (topics?.length || 0);
+    if (totalItems === 0) return 0;
+
+    const completedResources = resources?.filter(r => r.completed).length || 0;
+    const completedTopics = topics?.filter(t => t.completed).length || 0;
+
+    const completedTotal = completedResources + completedTopics;
+    return Math.round((completedTotal / totalItems) * 100);
   };
 
   const calculateDaysRemaining = (endDate) => {
@@ -66,84 +79,95 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
         </div>
       </div>
 
-      {/* Plans Cards */}
+      {/* Plans List */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {planStates.map(plan => (
-          <div key={plan.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col relative">
-            <h2 className="text-3xl font-extrabold mb-2 text-center">{plan.title}</h2>
-            <p className="text-gray-600 mb-2">{plan.description}</p>
+        {planStates.map(plan => {
+          const progress = calculateProgress(plan.resources, plan.topics);
 
-            {/* Resources List */}
-            <div className="space-y-1">
-              {plan.resources?.map((resource, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={resource.completed}
-                    onChange={() => toggleResource(plan.id, index)}
-                  />
-                  <span className={resource.completed ? "line-through text-gray-400" : ""}>
-                    {resource.name}
-                  </span>
-                </div>
-              ))}
-            </div>
+          return (
+            <div key={plan.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col relative">
+              <h2 className="text-3xl font-extrabold mb-2 text-center">{plan.title}</h2>
+              <p className="text-gray-600 mb-2">{plan.description}</p>
 
-            {/* Topics List */}
-            <div className="mt-4">
-              <h4 className="font-semibold text-sm text-gray-600">Topics:</h4>
-              <ul className="list-disc pl-5">
-                {plan.topics?.map((topic, index) => (
-                  <li key={index} className="text-gray-700">{topic.name}</li>
+              {/* Resources List */}
+              <div className="space-y-1">
+                {plan.resources?.map((resource, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={resource.completed}
+                      onChange={() => toggleResource(plan.id, index)}
+                    />
+                    <span className={resource.completed ? "line-through text-gray-400" : ""}>
+                      {resource.name}
+                    </span>
+                  </div>
                 ))}
-              </ul>
-            </div>
-            <br />
+              </div>
 
-            {/* Dates */}
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-500"><strong>Start:</strong> {plan.startDate?.split('T')[0]}</span>
-              <span className="text-sm text-gray-500"><strong>End:</strong> {plan.endDate?.split('T')[0]}</span>
-            </div>
+              {/* Topics List */}
+              <div className="mt-4">
+                <h4 className="font-semibold text-sm text-gray-600 mb-1">Topics:</h4>
+                <ul className="list-none space-y-1">
+                  {plan.topics?.map((topic, index) => (
+                    <li key={index} className="flex items-center gap-2 text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={topic.completed || false}
+                        onChange={() => toggleTopic(plan.id, index)}
+                      />
+                      <span className={topic.completed ? "line-through text-gray-400" : ""}>
+                        {topic.name}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-            {/* Days Remaining */}
-            <div className="text-sm text-red-500 mb-4">
-              <strong>Days Remaining:</strong> {calculateDaysRemaining(plan.endDate)} days
-            </div>
+              <br />
 
-            {/* Progress Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-              <div
-                className="bg-blue-600 h-2.5 rounded-full"
-                style={{ width: `${calculateProgress(plan.resources)}%` }}
-              ></div>
-            </div>
+              {/* Dates */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-500"><strong>Start:</strong> {plan.startDate?.split('T')[0]}</span>
+                <span className="text-sm text-gray-500"><strong>End:</strong> {plan.endDate?.split('T')[0]}</span>
+              </div>
 
-            {/* Completion Toggle */}
-            <div className="flex items-center justify-center mb-4">
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={plan.completed || false}
-                  onChange={() => toggleCompletion(plan.id)}
-                  className="sr-only peer"
-                />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-green-500">
-                  <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+              {/* Days Remaining or Completed */}
+              <div className="text-sm mb-4 flex items-center gap-2 justify-center">
+                {plan.completed ? (
+                  <span className="text-green-600 font-semibold flex items-center gap-1">
+                    <span>✅</span> Completed
+                  </span>
+                ) : (
+                  <span className="text-red-500">
+                    <strong>Days Remaining:</strong> {calculateDaysRemaining(plan.endDate)} days
+                  </span>
+                )}
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+
+              {/* Completed Label (after Progress Bar) */}
+              {plan.completed && (
+                <div className="text-center text-green-600 font-bold text-sm mt-2">
+                  ✅ Plan Completed
                 </div>
-                <span className="ml-3 text-sm font-medium text-gray-900">
-                  {plan.completed ? "Completed" : "Not Completed"}
-                </span>
-              </label>
-            </div>
+              )}
 
-            {/* Action Buttons */}
-            <div className="mt-auto flex justify-end space-x-3 pt-4">
-              <button onClick={() => onEdit(plan)} className="text-blue-500 hover:text-blue-700"><FaEdit /></button>
-              <button onClick={() => onDelete(plan.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
+              {/* Action Buttons */}
+              <div className="mt-auto flex justify-end space-x-3 pt-4">
+                <button onClick={() => onEdit(plan)} className="text-blue-500 hover:text-blue-700"><FaEdit /></button>
+                <button onClick={() => onDelete(plan.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </>
   );
