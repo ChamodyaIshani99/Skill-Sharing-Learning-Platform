@@ -1,142 +1,184 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import animationImage from "../../assets/Business Plan.png";
 
-const LearningPlanForm = ({ onSubmit }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [topics, setTopics] = useState([""]);
-  const [resources, setResources] = useState([""]);
-  const [timeline, setTimeline] = useState({ start: "", end: "" });
+const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD
 
-  const handleTopicChange = (index, value) => {
-    const newTopics = [...topics];
-    newTopics[index] = value;
-    setTopics(newTopics);
-  };
+const LearningPlanForm = ({ onSave, onCancel, initialData = {} }) => {
+  const [plan, setPlan] = useState({
+    title: "",
+    description: "",
+    topics: [{ name: "", resources: [""] }],
+    startDate: today,
+    endDate: "",
+  });
 
-  const handleResourceChange = (index, value) => {
-    const newResources = [...resources];
-    newResources[index] = value;
-    setResources(newResources);
-  };
-
-  const addTopic = () => setTopics([...topics, ""]);
-  const addResource = () => setResources([...resources, ""]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    const learningPlan = {
-      title,
-      description,
-      topics,
-      resources,
-      startDate: timeline.start,
-      endDate: timeline.end,
-      userId: "user123", // Replace this with actual user id if available
-    };
-  
-    try {
-      const response = await fetch("http://localhost:8081/api/learning-plans", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(learningPlan),
+  useEffect(() => {
+    if (initialData.id) {
+      setPlan({
+        ...initialData,
+        topics: initialData.topics || [{ name: "", resources: [""] }],
       });
-  
-      if (response.ok) {
-        const savedPlan = await response.json();
-        console.log("Saved plan:", savedPlan);
-        alert("Learning Plan saved successfully!");
-  
-        // Optionally reset form here
-        setTitle("");
-        setDescription("");
-        setTopics([""]);
-        setResources([""]);
-        setTimeline({ start: "", end: "" });
-  
-      } else {
-        alert("Failed to save plan.");
-      }
-    } catch (error) {
-      console.error("Error saving plan:", error);
-      alert("Error occurred while saving plan.");
     }
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    setPlan({ ...plan, [e.target.name]: e.target.value });
   };
 
+  const handleTopicChange = (index, field, value) => {
+    const updatedTopics = [...plan.topics];
+    updatedTopics[index][field] = value;
+    setPlan({ ...plan, topics: updatedTopics });
+  };
+
+  const handleResourceChange = (topicIndex, resourceIndex, value) => {
+    const updatedTopics = [...plan.topics];
+    updatedTopics[topicIndex].resources[resourceIndex] = value;
+    setPlan({ ...plan, topics: updatedTopics });
+  };
+
+  const addTopic = () => {
+    setPlan({ ...plan, topics: [...plan.topics, { name: "", resources: [""] }] });
+  };
+
+  const addResource = (topicIndex) => {
+    const updatedTopics = [...plan.topics];
+    updatedTopics[topicIndex].resources.push("");
+    setPlan({ ...plan, topics: updatedTopics });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!plan.title || !plan.description) {
+      alert("Title and Description are required.");
+      return;
+    }
+    onSave(plan);
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow-md">
-      <h2 className="text-xl font-bold">Create Learning Plan</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
+      <form onSubmit={handleSubmit} className="relative bg-gray-100 p-8 rounded-2xl shadow-2xl w-[1000px] flex max-h-[90vh] overflow-hidden">
 
-      <input
-        type="text"
-        placeholder="Plan Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-        className="w-full p-2 border rounded"
+    {/* ✖️ Cross button */}
+    <button
+      type="button"
+      onClick={onCancel}
+      className="absolute top-4 right-6 text-gray-600 hover:text-gray-800 text-3xl font-bold"
+    >
+      &times;
+    </button>
+
+        {/* Left Side Form */}
+        <div className="w-2/3 pr-6 flex flex-col overflow-y-auto">
+          <h2 className="text-4xl font-bold text-center mb-8">{initialData.id ? "Update" : "Create"} Learning Plan</h2>
+
+          <div>
+            <label className="block mb-1 font-semibold">Title</label>
+            <input 
+              type="text" 
+              name="title" 
+              value={plan.title} 
+              onChange={handleChange} 
+              className="input input-bordered w-full rounded-lg p-2" 
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 font-semibold">Description</label>
+            <textarea 
+              name="description" 
+              value={plan.description} 
+              onChange={handleChange} 
+              className="textarea textarea-bordered w-full rounded-lg p-2" 
+            />
+          </div>
+
+         {/* Topics and Resources */}
+<div>
+  <label className="block mb-1 font-semibold">Topics and Resources</label>
+  {plan.topics.map((topic, topicIndex) => (
+    <div key={topicIndex} className="mb-4 p-4 border rounded-lg bg-white">
+      <input 
+        type="text" 
+        placeholder={`Topic ${topicIndex + 1}`} 
+        value={topic.name} 
+        onChange={(e) => handleTopicChange(topicIndex, "name", e.target.value)} 
+        className="input input-bordered w-full mb-2 rounded-lg p-2 bg-gray-100 focus:bg-gray-200" 
       />
-
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="w-full p-2 border rounded"
-      />
-
-      <div>
-        <label className="font-semibold">Topics</label>
-        {topics.map((topic, i) => (
-          <input
-            key={i}
-            type="text"
-            value={topic}
-            onChange={(e) => handleTopicChange(i, e.target.value)}
-            className="w-full p-2 border rounded mt-1 mb-2"
-          />
-        ))}
-        <button type="button" onClick={addTopic} className="text-blue-600">+ Add Topic</button>
-      </div>
-
-      <div>
-        <label className="font-semibold">Resources</label>
-        {resources.map((resource, i) => (
-          <input
-            key={i}
-            type="text"
-            value={resource}
-            onChange={(e) => handleResourceChange(i, e.target.value)}
-            className="w-full p-2 border rounded mt-1 mb-2"
-          />
-        ))}
-        <button type="button" onClick={addResource} className="text-blue-600">+ Add Resource</button>
-      </div>
-
-      <div className="flex gap-4">
+      {topic.resources.map((resource, resourceIndex) => (
         <input
-          type="date"
-          value={timeline.start}
-          onChange={(e) => setTimeline({ ...timeline, start: e.target.value })}
-          className="p-2 border rounded"
+          key={resourceIndex}
+          type="text"
+          placeholder={`Resource ${resourceIndex + 1}`}
+          value={resource}
+          onChange={(e) => handleResourceChange(topicIndex, resourceIndex, e.target.value)}
+          className="input input-bordered w-full mb-2 rounded-lg p-2 bg-gray-100 focus:bg-gray-200" 
         />
-        <input
-          type="date"
-          value={timeline.end}
-          onChange={(e) => setTimeline({ ...timeline, end: e.target.value })}
-          className="p-2 border rounded"
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      ))}
+      <button 
+        type="button" 
+        onClick={() => addResource(topicIndex)} 
+        className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg text-sm"
       >
-        Save Plan
+        ➕ Add Resource
       </button>
-    </form>
+    </div>
+  ))}
+  <button 
+    type="button" 
+    onClick={addTopic} 
+    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg text-sm mt-2"
+  >
+    ➕ Add Topic
+  </button>
+</div>
+
+
+          {/* Dates */}
+          <div className="flex space-x-4">
+            <div className="flex-1">
+              <label className="block mb-1 font-semibold">Start Date</label>
+              <input 
+                type="date" 
+                name="startDate" 
+                value={plan.startDate} 
+                min={today} 
+                onChange={handleChange} 
+                className="input input-bordered w-full rounded-lg p-2" 
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block mb-1 font-semibold">End Date</label>
+              <input 
+                type="date" 
+                name="endDate" 
+                value={plan.endDate} 
+                min={plan.startDate} 
+                onChange={handleChange} 
+                className="input input-bordered w-full rounded-lg p-2" 
+              />
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-between pt-6">
+            <button type="submit" className="w-1/2 mr-2 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg">Save</button>
+            <button type="button" onClick={onCancel} className="w-1/2 ml-2 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg">Cancel</button>
+          </div>
+        </div>
+
+        {/* Right Side Animation */}
+        <div className="w-1/3 flex items-center justify-center">
+          <img 
+            src={animationImage} 
+            alt="Learning Animation" 
+            className="w-full h-auto animate-float shadow-lg rounded-xl" 
+          />
+        </div>
+
+      </form>
+    </div>
   );
 };
 

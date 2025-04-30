@@ -9,7 +9,7 @@ import backend.demo.model.LearningPlan;
 import backend.demo.repository.LearningPlanRepository;
 
 @Service
-public class LerningPlanService {
+public class LearningPlanService {
     @Autowired
     private LearningPlanRepository repository;
 
@@ -33,7 +33,13 @@ public class LerningPlanService {
     }
 
     public List<LearningPlan> getAllPlans() {
+    try {
         return repository.findAll();
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Error fetching learning plans: " + e.getMessage());
     }
+}
+
     
 }
