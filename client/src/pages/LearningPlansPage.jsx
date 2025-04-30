@@ -5,7 +5,7 @@ import LearningPlanList from "../components/LearningPlan/LearningPlanList";
 import LoadingSpinner from "../components/LearningPlan/LoadingSpinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Plan from "../assets/plan.png";
+import Plan from "../assets/plan.jpg";
 
 const LearningPlansPage = () => {
   const [plans, setPlans] = useState([]);
@@ -15,26 +15,40 @@ const LearningPlansPage = () => {
   const [totalPlans, setTotalPlans] = useState(0);
   const [pendingPlans, setPendingPlans] = useState(0);
 
-  const fetchPlans = async () => {
-    setLoading(true);
-    try {
-      const res = await getAllPlans();
-      setPlans(res.data);
-      updatePlanCounts(res.data);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load plans");
-    }
-    setLoading(false);
-  };
+ const fetchPlans = async () => {
+  setLoading(true);
+  try {
+    const res = await getAllPlans();
 
-  const updatePlanCounts = (plansData) => {
-    setTotalPlans(plansData.length);
-    const pending = plansData.filter(plan => 
-      !plan.resources?.every(resource => resource.completed)
-    ).length;
-    setPendingPlans(pending);
-  };
+    // Ensure each plan has non-null resources and topics
+    const cleanedPlans = res.data.map(plan => ({
+      ...plan,
+      resources: plan.resources || [],
+      topics: plan.topics || [],
+    }));
+
+    setPlans(cleanedPlans);
+    updatePlanCounts(cleanedPlans);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load plans");
+  }
+  setLoading(false);
+};
+
+
+ const updatePlanCounts = (plansData) => {
+  setTotalPlans(plansData.length);
+
+  const pending = plansData.filter(plan => {
+    const resourcesIncomplete = plan.resources?.some(resource => !resource.completed);
+    const topicsIncomplete = plan.topics?.some(topic => !topic.completed);
+    return resourcesIncomplete || topicsIncomplete;
+  }).length;
+
+  setPendingPlans(pending);
+};
+
 
   useEffect(() => {
     fetchPlans();
@@ -71,13 +85,13 @@ const LearningPlansPage = () => {
     }
   };
 
-  const handleResourceToggle = (updatedPlans) => {
-    setPlans(updatedPlans);
-    updatePlanCounts(updatedPlans);
-  };
+ const handleResourceToggle = (updatedPlans) => {
+  setPlans(updatedPlans);
+  updatePlanCounts(updatedPlans);
+};
 
   return (
-    <div className="p-8 min-h-screen bg-black">
+    <div className="p-8 min-h-screen ">
       <ToastContainer />
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-extrabold text-blue-700">🎯 Learning Plans</h1>

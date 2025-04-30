@@ -85,7 +85,7 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
           const progress = calculateProgress(plan.resources, plan.topics);
 
           return (
-            <div key={plan.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col relative">
+          <div key={plan.id} className="bg-gray-100 p-6 rounded-lg shadow-md flex flex-col relative">
               <h2 className="text-3xl font-extrabold mb-2 text-center">{plan.title}</h2>
               <p className="text-gray-600 mb-2">{plan.description}</p>
 
@@ -132,18 +132,7 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
                 <span className="text-sm text-gray-500"><strong>End:</strong> {plan.endDate?.split('T')[0]}</span>
               </div>
 
-              {/* Days Remaining or Completed */}
-              <div className="text-sm mb-4 flex items-center gap-2 justify-center">
-                {plan.completed ? (
-                  <span className="text-green-600 font-semibold flex items-center gap-1">
-                    <span>✅</span> Completed
-                  </span>
-                ) : (
-                  <span className="text-red-500">
-                    <strong>Days Remaining:</strong> {calculateDaysRemaining(plan.endDate)} days
-                  </span>
-                )}
-              </div>
+              
 
               {/* Progress Bar */}
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
