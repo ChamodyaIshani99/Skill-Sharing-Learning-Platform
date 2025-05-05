@@ -64,30 +64,60 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
   return (
     <>
       {/* Summary Section */}
-      <div className="flex justify-center gap-8 mb-8">
-        <div className="bg-white p-4 rounded-lg shadow text-center">
-          <h3 className="font-bold text-lg text-blue-600">Total Plans</h3>
-          <p className="text-xl font-semibold">{totalPlans}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow text-center">
-          <h3 className="font-bold text-lg text-green-600">Completed Plans</h3>
-          <p className="text-xl font-semibold">{completedPlans}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow text-center">
-          <h3 className="font-bold text-lg text-red-600">Pending Plans</h3>
-          <p className="text-xl font-semibold">{pendingPlans}</p>
-        </div>
-      </div>
+<div className="flex justify-center gap-8 mb-8">
+  {/* Total Plans */}
+  <div
+    className="w-64 h-40 rounded-2xl text-black p-6 shadow-lg text-center flex flex-col justify-center items-center transition-transform transform hover:scale-105"
+    style={{
+      background:
+        "linear-gradient(90deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 60%, rgba(40,60,173,1) 100%)",
+    }}
+  >
+    <h3 className="text-xl font-bold mb-2">Total Plans</h3>
+    <p className="text-4xl font-extrabold">{totalPlans}</p>
+  </div>
+
+  {/* Completed Plans */}
+  <div
+    className="w-64 h-40 rounded-2xl text-black p-6 shadow-lg text-center flex flex-col justify-center items-center transition-transform transform hover:scale-105"
+    style={{
+      background:
+        "linear-gradient(90deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 60%, rgba(40,60,173,1) 100%)",
+    }}
+  >
+    <h3 className="text-xl font-bold mb-2">Completed Plans</h3>
+    <p className="text-4xl font-extrabold">{totalPlans - pendingPlans}</p>
+  </div>
+
+  {/* Pending Plans */}
+  <div
+    className="w-64 h-40 rounded-2xl text-black p-6 shadow-lg text-center flex flex-col justify-center items-center transition-transform transform hover:scale-105"
+    style={{
+      background:
+        "linear-gradient(90deg, rgba(42,123,155,1) 0%, rgba(87,199,133,1) 60%, rgba(40,60,173,1) 100%)",
+    }}
+  >
+    <h3 className="text-xl font-bold mb-2">Pending Plans</h3>
+    <p className="text-4xl font-extrabold">{pendingPlans}</p>
+  </div>
+</div>
+
 
       {/* Plans List */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-black">
         {planStates.map(plan => {
           const progress = calculateProgress(plan.resources, plan.topics);
 
           return (
-          <div key={plan.id} className="bg-gray-100 p-6 rounded-lg shadow-md flex flex-col relative">
-              <h2 className="text-3xl font-extrabold mb-2 text-center">{plan.title}</h2>
-              <p className="text-gray-600 mb-2">{plan.description}</p>
+<div
+  key={plan.id}
+  className="bg-gray-200 p-6 rounded-xl shadow-lg flex flex-col relative text-gray-900"
+>
+
+
+              <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">{plan.title}</h2>
+              <p className="text-base font-semibold text-gray-700 mb-4">{plan.description}</p>
+
 
               {/* Resources List */}
               <div className="space-y-1">
@@ -135,12 +165,12 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
               
 
               {/* Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                <div
-                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
+               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2 mt-4">
+    <div
+      className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+      style={{ width: `${progress || 0}%` }}
+    ></div>
+  </div>
 
               {/* Completed Label (after Progress Bar) */}
               {plan.completed && (
@@ -158,6 +188,7 @@ const LearningPlanList = ({ plans, onEdit, onDelete, onResourceToggle }) => {
           );
         })}
       </div>
+      
     </>
   );
 };
