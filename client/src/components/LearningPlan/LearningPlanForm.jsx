@@ -62,8 +62,8 @@ const LearningPlanForm = ({ onSave, onCancel, initialData = {} }) => {
   };
 
   return (
-<div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-90 z-50 p-4">
-<form onSubmit={handleSubmit} className="relative bg-gray-200 p-8 rounded-2xl shadow-2xl w-[1000px] flex max-h-[90vh] overflow-hidden">
+<div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-90 z-50 p-4">
+<form onSubmit={handleSubmit} className="relative bg-gray-300 p-8 rounded-2xl shadow-2xl w-[1000px] flex max-h-[90vh] overflow-hidden">
         {/* ✖️ Cross button */}
         <button
           type="button"
@@ -100,50 +100,61 @@ const LearningPlanForm = ({ onSave, onCancel, initialData = {} }) => {
             />
           </div>
 
-          {/* Topics and Resources */}
-          <div>
-            <label className="block mb-1 text-black font-semibold">Topics and Resources</label>
-            {Array.isArray(plan.topics) &&
-              plan.topics.map((topic, topicIndex) => (
-                <div key={topicIndex} className="mb-4 p-4 border rounded-lg bg-white mb-1 text-black">
-                  <input
-                    type="text"
-                    placeholder={`Topic ${topicIndex + 1}`}
-                    value={topic.name}
-                    onChange={(e) =>
-                      handleTopicChange(topicIndex, "name", e.target.value)
-                    }
-                    className="input input-bordered w-full rounded-lg p-2 bg-gray-100 focus:bg-gray-200 mb-1 text-black"
-                  />
-                  {topic.resources.map((resource, resourceIndex) => (
-                    <input
-                      key={resourceIndex}
-                      type="text"
-                      placeholder={`Resource ${resourceIndex + 1}`}
-                      value={resource}
-                      onChange={(e) =>
-                        handleResourceChange(topicIndex, resourceIndex, e.target.value)
-                      }
-                      className="input input-bordered w-full mb-2 rounded-lg p-2 bg-gray-100 focus:bg-gray-200 mb-1 text-black"
-                    />
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => addResource(topicIndex)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg text-sm mb-1 text-black"
-                  >
-                    ➕ Add Resource
-                  </button>
-                </div>
-              ))}
-            <button
-              type="button"
-              onClick={addTopic}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg text-sm mt-2 mb-1 text-black"
-            >
-              ➕ Add Topic
-            </button>
-          </div>
+     {/* Topics and Resources */}
+<div>
+  <label className="block mb-1 text-black font-semibold">Topics and Resources</label>
+  {Array.isArray(plan.topics) &&
+    plan.topics.map((topic, topicIndex) => (
+      <div
+        key={topicIndex}
+        className="mb-4 p-4 border rounded-lg bg-white mb-1 text-black"
+      >
+        <label><b>Topic</b></label>
+        <input
+          type="text"
+          placeholder={`Topic ${topicIndex + 1}`}
+          value={topic.name}
+          onChange={(e) =>
+            handleTopicChange(topicIndex, "name", e.target.value)
+          }
+          className="input input-bordered w-full rounded-lg p-2 mb-2 text-black"
+          style={{ backgroundColor: "#6CB4EE" }}
+        />
+        {topic.resources.map((resource, resourceIndex) => (
+  <div key={resourceIndex}>
+    <label>Resource</label>
+    <input
+      type="text"
+      placeholder={`Resource ${resourceIndex + 1}`}
+      value={resource}
+      onChange={(e) =>
+        handleResourceChange(topicIndex, resourceIndex, e.target.value)
+      }
+      className="input input-bordered w-full rounded-lg p-2 mb-2 text-black placeholder-black"
+      style={{ backgroundColor: "#B9D9EB" }}
+    />
+  </div>
+))}
+
+        <button
+          type="button"
+          onClick={() => addResource(topicIndex)}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg text-sm mb-1"
+        >
+          ➕ Add Resource
+        </button>
+      </div>
+    ))}
+  <button
+    type="button"
+    onClick={addTopic}
+    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-lg text-sm mt-2 mb-1"
+  >
+    ➕ Add Topic
+  </button>
+</div>
+
+
 
           {/* Dates */}
           <div className="flex space-x-4">

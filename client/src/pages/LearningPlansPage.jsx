@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import {getAllPlans,createPlan,updatePlan, deletePlan,} from "../api/learningPlanApi";
+import { getAllPlans, createPlan, updatePlan, deletePlan } from "../api/learningPlanApi";
 import LearningPlanForm from "../components/LearningPlan/LearningPlanForm";
 import LearningPlanList from "../components/LearningPlan/LearningPlanList";
 import LoadingSpinner from "../components/LearningPlan/LoadingSpinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import pic from "../assets/pic.png";
+import { Link } from "react-scroll"; // Import react-scroll
 
 const LearningPlansPage = () => {
   const [plans, setPlans] = useState([]);
@@ -15,12 +17,10 @@ const LearningPlansPage = () => {
   const [completedPlans, setCompletedPlans] = useState(0);
   const [pendingPlans, setPendingPlans] = useState(0);
 
-
   const fetchPlans = async () => {
     setLoading(true);
     try {
       const res = await getAllPlans();
-
       const cleanedPlans = res.data.map((plan) => ({
         ...plan,
         resources: plan.resources || [],
@@ -93,21 +93,54 @@ const LearningPlansPage = () => {
   };
 
   return (
-    <div className="p-8 min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="p-8 min-h-screen bg-[#0a2351] text-white">
       <ToastContainer />
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-blue-400">
-          🎯 Learning Plans
-        </h1>
+        <h1 className="text-4xl font-extrabold text-blue-400">🎯 Learning Plans</h1>
         <button
-          onClick={() => setFormVisible(true)}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all duration-300"
-        >
-          Add New Plan
-        </button>
+  onClick={() => setFormVisible(true)}
+  className="px-6 py-2 bg-[#0000FF] hover:bg-blue-700 text-white rounded-full shadow-md transition-all duration-300"
+>
+  Add New Plan
+</button>
+
       </div>
 
       <br />
+      <div className="relative w-full mb-8 rounded-lg shadow-lg overflow-hidden">
+        <div className="flex justify-between">
+          <div className="w-1/2 mt-16 animate-slideInLeft opacity-0">
+            <h2
+              className="text-5xl font-extrabold mb-6"
+              style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.7)" }}
+            >
+              Learning Plan
+            </h2>
+            <p className="mb-8">
+              A Learning Plan is a structured roadmap that outlines what a person wants to learn,
+              the resources they'll use, and the timeline to achieve their learning goals. It helps
+              track progress, stay focused, and build skills efficiently.
+            </p>
+            <Link
+              to="all-plans" // Target the section with id="all-plans"
+              smooth={true} // Smooth scrolling
+              duration={500} // Duration of scroll animation
+            >
+              <button className="bg-[#66FF00] text-black font-semibold px-6 py-2 rounded-md shadow-md hover:opacity-90 transition-all duration-300">
+                Get Started
+              </button>
+            </Link>
+          </div>
+          <div className="w-1/2 animate-float flex justify-end">
+            <img
+              src={pic}
+              alt="Learning Illustration"
+              className="w-[90%] h-[550px] object-cover rounded-lg shadow-lg"
+            />
+          </div>
+        </div>
+      </div>
+
       <h1 id="all-plans" className="text-2xl font-bold mb-4">
         All Plans
       </h1>
