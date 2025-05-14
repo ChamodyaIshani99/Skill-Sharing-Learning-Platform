@@ -6,7 +6,7 @@ import LoadingSpinner from "../components/LearningPlan/LoadingSpinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import pic from "../assets/pic.png";
-import { Link } from "react-scroll"; // Import react-scroll
+import { Link } from "react-scroll";
 
 const LearningPlansPage = () => {
   const [plans, setPlans] = useState([]);
@@ -14,7 +14,6 @@ const LearningPlansPage = () => {
   const [formVisible, setFormVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState({});
   const [totalPlans, setTotalPlans] = useState(0);
-  const [completedPlans, setCompletedPlans] = useState(0);
   const [pendingPlans, setPendingPlans] = useState(0);
 
   const fetchPlans = async () => {
@@ -26,7 +25,6 @@ const LearningPlansPage = () => {
         resources: plan.resources || [],
         topics: plan.topics || [],
       }));
-
       setPlans(cleanedPlans);
       updatePlanCounts(cleanedPlans);
     } catch (err) {
@@ -38,17 +36,11 @@ const LearningPlansPage = () => {
 
   const updatePlanCounts = (plansData) => {
     setTotalPlans(plansData.length);
-
     const pending = plansData.filter((plan) => {
-      const resourcesIncomplete = plan.resources?.some(
-        (resource) => !resource.completed
-      );
-      const topicsIncomplete = plan.topics?.some(
-        (topic) => !topic.completed
-      );
-      return resourcesIncomplete || topicsIncomplete;
+      const incompleteResources = plan.resources?.some((r) => !r.completed);
+      const incompleteTopics = plan.topics?.some((t) => !t.completed);
+      return incompleteResources || incompleteTopics;
     }).length;
-
     setPendingPlans(pending);
   };
 
@@ -93,56 +85,61 @@ const LearningPlansPage = () => {
   };
 
   return (
-    <div className="p-8 min-h-screen bg-[#0a2351] text-white">
-      <ToastContainer />
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold text-blue-400">🎯 Learning Plans</h1>
-        <button
-  onClick={() => setFormVisible(true)}
-  className="px-6 py-2 bg-[#0000FF] hover:bg-blue-700 text-white rounded-full shadow-md transition-all duration-300"
->
-  Add New Plan
-</button>
+    <div className="p-8 min-h-screen bg-gradient-to-br from-[#081b33] via-[#0a2351] to-[#0c2a63] text-white font-sans">
+      <ToastContainer position="top-right" autoClose={2500} theme="colored" />
 
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-500 text-transparent bg-clip-text">
+          🎯 Learning Plans
+        </h1>
+        <button
+          onClick={() => setFormVisible(true)}
+          className="px-6 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-blue-600 hover:to-indigo-600 shadow-lg transition-all duration-300"
+        >
+          ➕ Add New Plan
+        </button>
       </div>
 
-      <br />
-      <div className="relative w-full mb-8 rounded-lg shadow-lg overflow-hidden">
-        <div className="flex justify-between">
-          <div className="w-1/2 mt-16 animate-slideInLeft opacity-0">
-            <h2
-              className="text-5xl font-extrabold mb-6"
-              style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.7)" }}
-            >
-              Learning Plan
-            </h2>
-            <p className="mb-8">
-              A Learning Plan is a structured roadmap that outlines what a person wants to learn,
-              the resources they'll use, and the timeline to achieve their learning goals. It helps
-              track progress, stay focused, and build skills efficiently.
-            </p>
-            <Link
-              to="all-plans" // Target the section with id="all-plans"
-              smooth={true} // Smooth scrolling
-              duration={500} // Duration of scroll animation
-            >
-              <button className="bg-[#66FF00] text-black font-semibold px-6 py-2 rounded-md shadow-md hover:opacity-90 transition-all duration-300">
-                Get Started
-              </button>
-            </Link>
-          </div>
-          <div className="w-1/2 animate-float flex justify-end">
-            <img
-              src={pic}
-              alt="Learning Illustration"
-              className="w-[90%] h-[550px] object-cover rounded-lg shadow-lg"
-            />
-          </div>
+      {/* Hero Section */}
+      <div className="relative w-full mb-14 rounded-xl overflow-hidden shadow-xl bg-[#0f2e5a] p-10 flex flex-col md:flex-row gap-8">
+        <div className="w-full md:w-1/2 space-y-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
+            Build Your Learning Path
+          </h2>
+          <p className="text-lg text-gray-200">
+            Create, track, and manage your goals in a structured roadmap that helps you stay focused
+            and motivated. Your personalized learning journey starts here!
+          </p>
+          <Link to="all-plans" smooth duration={500}>
+            <button className="bg-lime-400 text-black px-6 py-3 font-semibold rounded-lg shadow-md hover:bg-lime-300 transition-all duration-300">
+              🚀 Get Started
+            </button>
+          </Link>
+        </div>
+        <div className="w-full md:w-1/2 flex justify-center items-center">
+          <img src={pic} alt="Learning" className="rounded-lg shadow-lg max-h-[400px]" />
         </div>
       </div>
 
-      <h1 id="all-plans" className="text-2xl font-bold mb-4">
-        All Plans
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div className="bg-[#153b75] p-6 rounded-lg shadow-md text-center">
+          <p className="text-sm text-gray-300">Total Plans</p>
+          <h3 className="text-3xl font-bold text-blue-300">{totalPlans}</h3>
+        </div>
+        <div className="bg-[#16418a] p-6 rounded-lg shadow-md text-center">
+          <p className="text-sm text-gray-300">Pending Plans</p>
+          <h3 className="text-3xl font-bold text-yellow-300">{pendingPlans}</h3>
+        </div>
+        <div className="bg-[#1750a5] p-6 rounded-lg shadow-md text-center">
+          <p className="text-sm text-gray-300">Completed Plans</p>
+          <h3 className="text-3xl font-bold text-green-300">{totalPlans - pendingPlans}</h3>
+        </div>
+      </div>
+
+      {/* Plan Section */}
+      <h1 id="all-plans" className="text-3xl font-bold mb-4 border-b border-gray-500 pb-2">
+        📋 All Learning Plans
       </h1>
 
       {loading ? (
